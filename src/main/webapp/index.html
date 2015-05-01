@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/themes/default/jquery.mobile-1.4.5.css" />
+<script src="js/jquery.js"></script>
+<script src="js/jquery.mobile-1.4.5.js"></script>
+<script src="js/purl.js"></script>
+<script type="text/javascript">
+	//默认栏目为48（重大教学）
+	localStorage.categoryId ="48";
+	//默认新闻为空
+	localStorage.newsId="";
+	//此处定义一个函数，用于刷新新闻列表
+	function reloadNewsList()
+	{
+		//查询id=newsList的元素清空（清空新闻列表）
+		$("#newsList").empty();
+		//发生ajax到findNewsByCategory.do查询新闻列表
+		$.ajax({
+			url : "findNewsByCategory.do",
+			//请求的参数，即findNewsByCategory.do?categoryId= localStorage.categoryId
+			data : {
+				categoryId : localStorage.categoryId
+				},
+			//请求成功后的回调函数
+			success : function(result) {
+				//生成新闻列表
+				for (i = 0; i < result.length; i++) {
+					var news = result[i];
+					//点击链接转到page2
+					var link=$('<a  id="newsid_'+news.id+'" href="#page2"><img height="80" src="'+news.img+'"></img><h3 style="white-space:pre-wrap;">'
+								+ news.title
+								+ '</h3></a>');
+					//为每个新闻链接添加点击事件
+					link.on("click",function(){
+						localStorage.newsId=$(this).attr("id").substring(7);
+					})
+					//添加新闻链接到列表
+					var li = $('<li></li>');
+					li.append(link);
+					$("#newsList").append(li);
+				}
+				//刷新id=newsList的元素（刷新新闻列表）
+				$("#newsList").listview('refresh');
+				}
+			});
+	}
+	//page1初始化
+	$(document).on("pageinit","#page1",function(){
+		//为所有class=menu的元素添加click事件（即为导航栏上的按键添加点击事件）
+		$(".menu").on("click",function() {
+			localStorage.categoryId = $(this).attr("id").substring(9);
+			reloadNewsList();
+		})
+		//加载新闻
+		reloadNewsList();
+	});
+	//page1显示前
+	$(document).on("pagebeforeshow","#page1",function(){
+		//将导航栏上选中的按键设置为“按下”样式
+		$("#category_"+localStorage.categoryId).addClass("ui-btn-active");
+	});
+	//page2显示前
+	$(document).on("pagebeforeshow","#page2",function(){
+		//清空页面
+		$("#newsTitle").empty();
+		$("#newsContent").empty();
+		//加载新闻
+		$.ajax({
+			url:"findNews.do",
+			data : {
+				newsId : localStorage.newsId
+			},
+			success:function(result){
+				var content=$(result.content);
+				$("#newsContent").append(content);
+				$("#newsTitle").html(result.title);
+			}
+		});
+	});
+</script>
+</head>
+
+<body>
+	<!-- 第一页 显示新闻栏目 默认缓存 -->
+	<div data-role="page"  data-dom-cache="true" id="page1">
+		<div data-role="header">
+			<h1>重大新闻网</h1>
+			<div data-role="navbar" id="navbar">
+				<ul id="navbar_ul">
+					<li><a id="category_48" class="menu" href="#" data-icon="home">重大教学</a></li>
+					<li><a id="category_47" class="menu" href="#" data-icon="arrow-r">重大学术</a></li>
+					<li><a id="category_46" class="menu" href="#" data-icon="arrow-r">重大科研</a></li>
+					<li><a id="category_53" class="menu" href="#" data-icon="arrow-r">招生就业</a></li>
+				</ul>
+			</div>
+		</div>
+		<div role="main" class="ui-content" >
+			<ul id="newsList" data-role="listview" data-inset="true">
+
+			</ul>
+		</div>
+	</div>
+	<!-- 第二页 显示新闻 默认不缓存-->
+	<div data-role="page"  data-dom-cache="false" id="page2">
+		<div data-role="header">
+			<a href="#" data-rel="back" data-role="button">返回</a>
+		</div>
+		<div role="main" class="ui-content" >
+			<h1 id="newsTitle"></h1>
+			<div id="newsContent"></div>
+		</div>
+	</div>
+</body>
+</html>
