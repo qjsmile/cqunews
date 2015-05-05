@@ -24,25 +24,45 @@ public class NewsController {
 		categories.add(new NewsCategory("47","重大学术" ));
 		categories.add(new NewsCategory("48","重大教学"));
 		categories.add(new NewsCategory("53","招生就业"));
+		categories.add(new NewsCategory("00","重要新闻"));
 		return categories;
 	}
 	@RequestMapping(value="/findNewsByCategory.do")
 	public List<News> findNewsByCategory(String categoryId)
 	{
 		List<News> newsList=new ArrayList<News>();
-		try {
-			Document doc = Jsoup.connect("http://news.cqu.edu.cn/news/article/list.php?catid="+categoryId).get();
-			Elements liphoto = doc.select("div.liphoto div.row1");
-			for(Element row:liphoto)
-			{
-				Element link=row.select("a").first();
-				Element img=row.select("img").first();
-				News news=new News(link.attr("href"),img.attr("alt"),"","http://news.cqu.edu.cn/"+img.attr("src"));
-				newsList.add(news);
+		if(categoryId.equals("00"))
+		{
+			try {
+				Document doc = Jsoup.connect("http://news.cqu.edu.cn/news/").get();
+				Elements topnews = doc.select("div.topnews li.tag_title");
+				for(Element row:topnews)
+				{
+					Element link=row.select("a").first();
+					News news=new News(link.attr("href"),link.attr("title"),"","");
+					newsList.add(news);
+				}
+				//System.out.println(liphoto);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			//System.out.println(liphoto);
-		} catch (IOException e) {
-			e.printStackTrace();
+		}
+		else
+		{
+			try {
+				Document doc = Jsoup.connect("http://news.cqu.edu.cn/news/article/list.php?catid="+categoryId).get();
+				Elements liphoto = doc.select("div.liphoto div.row1");
+				for(Element row:liphoto)
+				{
+					Element link=row.select("a").first();
+					Element img=row.select("img").first();
+					News news=new News(link.attr("href"),img.attr("alt"),"","http://news.cqu.edu.cn/"+img.attr("src"));
+					newsList.add(news);
+				}
+				//System.out.println(liphoto);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
 		}
 		return newsList;
 	}

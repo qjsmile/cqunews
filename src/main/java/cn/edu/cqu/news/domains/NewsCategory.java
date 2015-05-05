@@ -1,5 +1,5 @@
 package cn.edu.cqu.news.domains;
-
+/*新闻类别*/
 public class NewsCategory {
 	private String id;
 	private String name;
