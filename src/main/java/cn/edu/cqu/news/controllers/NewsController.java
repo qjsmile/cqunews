@@ -33,6 +33,7 @@ public class NewsController {
 		List<News> newsList=new ArrayList<News>();
 		try {
 			//当为重要新闻时，没有固定的归类，所以要分情况判断
+			//categoryId=00表示重要新闻
 			if(categoryId.equals("00")){
 				Document doc = Jsoup.connect("http://news.cqu.edu.cn/news/").get();
 				Elements topnews = doc.select("div.topnews li.tag_title");
