@@ -21,46 +21,34 @@
 		//发生ajax到findNewsByCategory.do查询新闻列表
 		$.ajax({
 			url : "findNewsByCategory.do",
-			//请求的参数，即findNewsByCategory.do?categoryId= localStorage.categoryId
 			data : {
 				categoryId : localStorage.categoryId
 				},
 			//请求成功后的回调函数
 			success : function(result) {
-				//生成新闻列表		
-				if(localStorage.categoryId=='00'){
-					for (i = 0; i < result.length; i++) {
-						var news = result[i];
-						//点击链接转到news.html
-						var link=$('<a  id="newsid_'+news.id+'" href="news.html" rel="external" ><h3 style="white-space:pre-wrap;">'
-									+ news.title
-									+ '</h3></a>');
-						//为每个新闻链接添加点击事件
-						link.on("click",function(){
-							localStorage.newsId=$(this).attr("id").substring(7);
-						})
-						//添加新闻链接到列表
-						var li = $('<li></li>');
-						li.append(link);
-						$("#newsList").append(li);
-					}					
-				}else{
-					for (i = 0; i < result.length; i++) {
-						var news = result[i];
-						//点击链接转到news.html
-						var link=$('<a  id="newsid_'+news.id+'" href="news.html" rel="external" ><img height="80" src="'+news.img+'"></img><h3 style="white-space:pre-wrap;">'
-									+ news.title
-									+ '</h3></a>');
-						//为每个新闻链接添加点击事件
-						link.on("click",function(){
-							localStorage.newsId=$(this).attr("id").substring(7);
-						})
-						//添加新闻链接到列表
-						var li = $('<li></li>');
-						li.append(link);
-						$("#newsList").append(li);
+				//生成新闻列表,分类判断
+				for (i = 0; i < result.length; i++) {
+					var news = result[i];
+					//点击链接转到NewsFile.html 
+					if(localStorage.categoryId=='00'){
+						var link=$('<a  id="newsid_'+news.id+'" href="showNews.html" rel="external" ><h3 style="white-space:pre-wrap;">'
+								+ news.title
+								+ '</h3></a>');
+					}else
+					{
+						var link=$('<a  id="newsid_'+news.id+'" href="showNews.html" rel="external"><img height="80" src="'+news.img+'"></img><h3 style="white-space:pre-wrap;">'
+								+ news.title
+								+ '</h3></a>');
 					}
-				}	
+					//为每个新闻链接添加点击事件
+					link.on("click",function(){
+						localStorage.newsId=$(this).attr("id").substring(7);
+					})
+					//添加新闻链接到列表
+					var li = $('<li></li>');
+					li.append(link);
+					$("#newsList").append(li);
+				}
 				//刷新id=newsList的元素（刷新新闻列表）
 				$("#newsList").listview('refresh');
 				}
@@ -81,8 +69,10 @@
 		//将导航栏上选中的按键设置为“按下”样式
 		$("#category_"+localStorage.categoryId).addClass("ui-btn-active");
 	});
+	
 </script>
 </head>
+
 <body>
 	<!-- 第一页 显示新闻栏目 默认缓存 -->
 	<div data-role="page"  data-dom-cache="true" id="page1">
@@ -90,18 +80,20 @@
 			<h1>重大新闻网</h1>
 			<div data-role="navbar" id="navbar">
 				<ul id="navbar_ul">
-				    <li><a id="category_00" class="menu" href="#" data-icon="home">重要新闻</a></li>
-					<li><a id="category_48" class="menu" href="#" data-icon="arrow-r">重大教学</a></li>
-					<li><a id="category_47" class="menu" href="#" data-icon="arrow-r">重大学术</a></li>
-					<li><a id="category_46" class="menu" href="#" data-icon="arrow-r">重大科研</a></li>
-					<li><a id="category_53" class="menu" href="#" data-icon="arrow-r">招生就业</a></li>
+					<li><a id="category_00" class="menu" href="#" data-icon="home" data-prefetch="ture">重要新闻</a></li>
+					<li><a id="category_48" class="menu" href="#" data-icon="arrow-r" data-prefetch="ture">重大教学</a></li>
+					<li><a id="category_47" class="menu" href="#" data-icon="arrow-r" data-prefetch="ture">重大学术</a></li>
+					<li><a id="category_46" class="menu" href="#" data-icon="arrow-r" data-prefetch="ture">重大科研</a></li>
+					<li><a id="category_53" class="menu" href="#" data-icon="arrow-r" data-prefetch="ture">招生就业</a></li>					
 				</ul>
 			</div>
 		</div>
 		<div role="main" class="ui-content" >
 			<ul id="newsList" data-role="listview" data-inset="true">
+
 			</ul>
 		</div>
 	</div>
+	
 </body>
 </html>
